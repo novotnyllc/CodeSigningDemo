@@ -34,9 +34,35 @@ jobs:
       verbosityPack: Minimal
     displayName: Build Package
 
-  - task: PublishPipelineArtifact@0
+  - publish: $(Build.ArtifactStagingDirectory)\Packages   
     displayName: Publish Build Artifacts  
-    inputs:
-      targetPath: $(Build.ArtifactStagingDirectory)\Packages      
-      artifactName: BuildPackages
+    artifact: BuildPackages
 
+- deployment: CodeSign
+  displayName: Code Signing
+  pool:
+    vmImage: windows-latest
+  dependsOn: Build
+  condition: not(eq(variables['build.reason'], 'PullRequest'))
+  environment: SignClientDemo - Code Sign
+  variables:
+  - group: Sign Client Credentials
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - checkout: self
+        
+        - download: current
+          artifact: BuildPackages
+        
+        - powershell: ./scripts/Sign-Package.ps1
+          displayName: Sign Packages
+          env:
+            SignClientUser: $(SignClientUser)
+            SignClientSecret: $(SignClientSecret)
+            ArtifactDirectory: $(Pipeline.Workspace)/BuildPackages
+            
+        - publish: $(Pipeline.Workspace)/BuildPackages
+          displayName: Publish Signed Packages
+          artifact: SignedPackages
