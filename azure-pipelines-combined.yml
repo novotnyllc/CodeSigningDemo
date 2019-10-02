@@ -6,63 +6,66 @@ pr:
 - master
 - rel/*
 
-jobs:
-- job: Build
-  pool:
-    vmImage: windows-latest
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
+      vmImage: windows-latest
 
-  variables:
-    BuildConfiguration: Release
+    variables:
+      BuildConfiguration: Release
 
-  steps:
-  - task: DotNetCoreCLI@2  
-    inputs:
-      command: custom
-      custom: tool
-      arguments: install --tool-path . nbgv
-    displayName: Install NBGV tool
+    steps:
+    - task: DotNetCoreCLI@2  
+      inputs:
+        command: custom
+        custom: tool
+        arguments: install --tool-path . nbgv
+      displayName: Install NBGV tool
 
-  - script: nbgv cloud
-    displayName: Set Version
+    - script: nbgv cloud
+      displayName: Set Version
 
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: pack
-      packagesToPack: src/AClassLibrary/AClassLibrary.csproj
-      configuration: $(BuildConfiguration)
-      packDirectory: $(Build.ArtifactStagingDirectory)\Packages    
-      verbosityPack: Minimal
-    displayName: Build Package
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: pack
+        packagesToPack: src/AClassLibrary/AClassLibrary.csproj
+        configuration: $(BuildConfiguration)
+        packDirectory: $(Build.ArtifactStagingDirectory)\Packages    
+        verbosityPack: Minimal
+      displayName: Build Package
 
-  - publish: $(Build.ArtifactStagingDirectory)\Packages   
-    displayName: Publish Build Artifacts  
-    artifact: BuildPackages
-
-- deployment: CodeSign
-  displayName: Code Signing
-  pool:
-    vmImage: windows-latest
-  dependsOn: Build
+    - publish: $(Build.ArtifactStagingDirectory)\Packages   
+      displayName: Publish Build Artifacts  
+      artifact: BuildPackages
+      
+- stage: CodeSign
   condition: not(eq(variables['build.reason'], 'PullRequest'))
-  environment: SignClientDemo - Code Sign
-  variables:
-  - group: Sign Client Credentials
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-        - checkout: self
-        
-        - download: current
-          artifact: BuildPackages
-        
-        - powershell: ./scripts/Sign-Package.ps1
-          displayName: Sign Packages
-          env:
-            SignClientUser: $(SignClientUser)
-            SignClientSecret: $(SignClientSecret)
-            ArtifactDirectory: $(Pipeline.Workspace)/BuildPackages
-            
-        - publish: $(Pipeline.Workspace)/BuildPackages
-          displayName: Publish Signed Packages
-          artifact: SignedPackages
+  jobs:
+  - deployment: CodeSign
+    displayName: Code Signing
+    pool:
+      vmImage: windows-latest    
+    environment: SignClientDemo - Code Sign
+    variables:
+    - group: Sign Client Credentials
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          
+          - download: current
+            artifact: BuildPackages
+          
+          - powershell: ./scripts/Sign-Package.ps1
+            displayName: Sign Packages
+            env:
+              SignClientUser: $(SignClientUser)
+              SignClientSecret: $(SignClientSecret)
+              ArtifactDirectory: $(Pipeline.Workspace)/BuildPackages
+              
+          - publish: $(Pipeline.Workspace)/BuildPackages
+            displayName: Publish Signed Packages
+            artifact: SignedPackages
