@@ -75,7 +75,7 @@ stages:
   - deployment: CIJob
     pool:
       vmImage: windows-latest
-    environment: CodeSignDemo - CI
+    environment: Azure Artifacts
     strategy:
       runOnce:
         deploy:
