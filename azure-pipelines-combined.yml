@@ -83,6 +83,6 @@ stages:
           - download: current
             artifact: SignedPackages
           - task: NuGetAuthenticate@0
-          - script: dotnet nuget push --api-key AzureArtifacts --source https://pkgs.dev.azure.com/onovotny/GitBuilds/_packaging/CodeSignDemo/nuget/v3/index.json $(Pipeline.Workspace)/SignedPackages/*.nupkg
+          - script: dotnet nuget push --api-key AzureArtifacts --source https://pkgs.dev.azure.com/onovotny/GitBuilds/_packaging/CodeSignDemo/nuget/v3/index.json $(Pipeline.Workspace)\SignedPackages\*.nupkg
             displayName: Push to Artifacts
        
