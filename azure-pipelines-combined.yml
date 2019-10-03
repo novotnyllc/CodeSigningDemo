@@ -59,7 +59,7 @@ stages:
           - download: current
             artifact: BuildPackages
           
-          - powershell: ./scripts/Sign-Package.ps1
+          - pwsh: ./scripts/Sign-Package.ps1
             displayName: Sign Packages
             env:
               SignClientUser: $(SignClientUser)
