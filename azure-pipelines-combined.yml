@@ -47,7 +47,7 @@ stages:
     displayName: Code Signing
     pool:
       vmImage: windows-latest    
-    environment: SignClientDemo - Code Sign
+    environment: Code Sign - Approvals
     variables:
     - group: Sign Client Credentials
     strategy:
