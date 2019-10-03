@@ -69,3 +69,22 @@ stages:
           - publish: $(Pipeline.Workspace)/BuildPackages
             displayName: Publish Signed Packages
             artifact: SignedPackages
+
+- stage: CI
+  jobs:
+  - deployment: CIJob
+    pool:
+      vmImage: windows-latest
+    strategy:
+      runOnce:
+        deploy:
+          steps:          
+          - download: current
+            artifact: SignedPackages
+          
+          - task: NuGetCommand@2
+            displayName: NuGet Push
+            inputs:
+              command: push
+              packagesToPush: $(Pipeline.Workspace)/SignedPackages/*.nupkg
+              publishVstsFeed: '96789f1c-e804-4671-be78-d063a4eced9b/73594112-df72-493e-8bae-53ffeca0b6a2'
