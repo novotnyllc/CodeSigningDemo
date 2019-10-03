@@ -75,6 +75,7 @@ stages:
   - deployment: CIJob
     pool:
       vmImage: windows-latest
+    environment: CodeSignDemo - CI
     strategy:
       runOnce:
         deploy:
