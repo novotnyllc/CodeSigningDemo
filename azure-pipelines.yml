@@ -39,7 +39,11 @@ stages:
     - publish: $(Build.ArtifactStagingDirectory)\Packages   
       displayName: Publish Build Artifacts  
       artifact: BuildPackages
-      
+
+    - publish: scripts
+      displayName: Publish Signing Scripts
+      artifact: SigningScripts
+
 - stage: CodeSign
   condition: and(succeeded('Build'), not(eq(variables['build.reason'], 'PullRequest')))
   jobs:
@@ -53,13 +57,15 @@ stages:
     strategy:
       runOnce:
         deploy:
-          steps:
-          - checkout: self
+          steps: 
           
           - download: current
             artifact: BuildPackages
-          
-          - pwsh: ./scripts/Sign-Package.ps1
+
+          - download: current
+            artifact: SigningScripts
+
+          - pwsh: $(Pipeline.Workspace)/SigningScripts/Sign-Package.ps1
             displayName: Sign Packages
             env:
               SignClientUser: $(SignClientUser)
@@ -69,20 +75,3 @@ stages:
           - publish: $(Pipeline.Workspace)/BuildPackages
             displayName: Publish Signed Packages
             artifact: SignedPackages
-
-- stage: CI
-  jobs:
-  - deployment: CIJob
-    pool:
-      vmImage: windows-latest
-    environment: Azure Artifacts
-    strategy:
-      runOnce:
-        deploy:
-          steps:          
-          - download: current
-            artifact: SignedPackages
-          - task: NuGetAuthenticate@0
-          - script: dotnet nuget push --api-key AzureArtifacts --source https://pkgs.dev.azure.com/onovotny/GitBuilds/_packaging/CodeSignDemo/nuget/v3/index.json $(Pipeline.Workspace)\SignedPackages\*.nupkg
-            displayName: Push to Artifacts
-       
