@@ -82,7 +82,7 @@ stages:
               --secret "$(SignClientSecret)" `
               --name "CodeSignDemo" `
               --description "CodeSignDemo" `
-              --descriptionUrl "https://github.com/onovotny/CodeSignDemo"
+              --descriptionUrl "https://github.com/novotnyllc/CodeSignDemo"
             displayName: Sign packages
               
           - publish: $(Pipeline.Workspace)/BuildPackages
