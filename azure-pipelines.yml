@@ -62,9 +62,11 @@ stages:
     steps:
     - download: current
       artifact: config
-      
+      displayName: Download signing file list
+
     - download: current
       artifact: BuildPackages
+      displayName: Download build artifacts
 
     - task: UseDotNet@2
       displayName: 'Use .NET SDK 6.x'
@@ -82,7 +84,7 @@ stages:
         .\sign "code azure-key-vault" `
         "**/*.nupkg" `
         --timestamp-url "http://timestamp.digicert.com" `
-        --base-directory "$(Pipeline.Workspace)\BuildPackages" `                            
+        --base-directory "$(Pipeline.Workspace)\BuildPackages" `
         --file-list "$(Pipeline.Workspace)\config\filelist.txt" `
         --publisher-name "CodeSignDemo" `
         --description "CodeSignDemo" `
@@ -90,7 +92,7 @@ stages:
         --azure-key-vault-tenant-id "$(SignTenantId)" `
         --azure-key-vault-client-id "$(SignClientId)" `
         --azure-key-vault-certificate "$(SignClientId)" `
-        --azure-key-vault-client-secret '$(SignClientSecret)' 
+        --azure-key-vault-client-secret '$(SignClientSecret)' `
         --azure-key-vault-certificate "$(SignKeyVaultCertificate)" `
         --azure-key-vault-url "$(SignKeyVaultUrl)" 
       displayName: Sign packages
