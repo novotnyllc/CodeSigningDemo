@@ -1,0 +1,29 @@
+name: Build and Sign
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.x
+        
+    - name: Build Package
+      run: dotnet pack --configuration Release src/AClassLibrary/AClassLibrary.csproj
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: BuildPackages
+        path: src/AClassLibrary/bin/Release/**/*.nupkg   
+    
