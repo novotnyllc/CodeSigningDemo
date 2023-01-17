@@ -24,7 +24,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: config
-        path: sconfig
+        path: config
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
