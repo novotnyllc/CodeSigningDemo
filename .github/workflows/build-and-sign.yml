@@ -10,6 +10,7 @@ jobs:
   build:    
     runs-on: ubuntu-latest
     steps:
+    - run: echo "Building branch $GITHUB_REF"    
     - uses: actions/checkout@v3
     
     - name: Setup .NET
@@ -30,16 +31,16 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: BuildArtifacts
-        path: src/AClassLibrary/bin/Release/**/*.nupkg   
+        path: src/AClassLibrary/bin/Release/**/*.nupkg
     
   sign:
-    if: github.ref == 'ref/heads/main' # Only run this job on the main branch
+    needs: build
+    runs-on: windows-latest
+    if: github.ref == 'ref/heads/main'
     permissions:
       id-token: write # Required for requesting the JWT
       
-    runs-on: windows-latest
-    steps:
-    
+    steps:    
     - name: Download signing config
       uses: actions/download-artifact@v3
       with:
