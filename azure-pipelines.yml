@@ -11,7 +11,7 @@ stages:
   jobs:
   - job: Build
     pool:
-      vmImage: windows-latest
+      vmImage: ubuntu-latest
     variables:
       BuildConfiguration: Release
 
@@ -21,26 +21,16 @@ stages:
       inputs:
         version: 6.x
 
-    - task: DotNetCoreCLI@2  
-      inputs:
-        command: custom
-        custom: tool
-        arguments: install --tool-path . nbgv
-      displayName: Install NBGV tool
-
-    - script: nbgv cloud
-      displayName: Set Version
-
     - task: DotNetCoreCLI@2
       inputs:
         command: pack
         packagesToPack: src/AClassLibrary/AClassLibrary.csproj
         configuration: $(BuildConfiguration)
-        packDirectory: $(Build.ArtifactStagingDirectory)\Packages    
+        packDirectory: $(Build.ArtifactStagingDirectory)/Packages    
         verbosityPack: Minimal
       displayName: Build Package
 
-    - publish: $(Build.ArtifactStagingDirectory)\Packages   
+    - publish: $(Build.ArtifactStagingDirectory)/Packages   
       displayName: Publish Build Artifacts  
       artifact: BuildPackages
 
