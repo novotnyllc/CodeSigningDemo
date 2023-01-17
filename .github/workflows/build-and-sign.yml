@@ -33,6 +33,7 @@ jobs:
         path: src/AClassLibrary/bin/Release/**/*.nupkg   
     
   sign:
+    if: ${{ github.ref == 'ref/heads/main' }} # Only run this job on the main branch
     permissions:
       id-token: write # Required for requesting the JWT
       
@@ -43,11 +44,13 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: config
+        path: config
         
     - name: Download build artifacts
       uses: actions/download-artifact@v3
       with:
         name: BuildArtifacts
+        path: BuildArtifacts
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -65,3 +68,21 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+    - name: Sign artifacts
+      run: >
+        sign code azure-key-vault
+        **/*.nupkg
+        --timestamp-url "http://timestamp.digicert.com"
+        --base-directory "BuildArtifacts"
+        --file-list "config/filelist.txt"
+        --publisher-name "CodeSignDemo"
+        --description "CodeSignDemo"
+        --description-url "https://github.com/novotnyllc/CodeSignDemo"
+        --azure-key-vault-managed-identity true
+        --azure-key-vault-url "${{ secrets.KEY_VAULT_CERTIFICATE_ID }}"
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: SignedArtifacts
+        path: BuildArtifacts
