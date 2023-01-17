@@ -36,7 +36,7 @@ jobs:
   sign:
     needs: build
     runs-on: windows-latest
-    if: github.ref == 'ref/heads/main'
+    if: ${{ github.ref == 'refs/heads/main' }}
     permissions:
       id-token: write # Required for requesting the JWT
       
