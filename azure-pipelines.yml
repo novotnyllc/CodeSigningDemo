@@ -1,9 +1,9 @@
 trigger:
-- master
+- main
 - rel/*
 
 pr:
-- master
+- main
 - rel/*
 
 stages:
@@ -17,6 +17,11 @@ stages:
       BuildConfiguration: Release
 
     steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET SDK 6.x'
+      inputs:
+        version: 6.x
+
     - task: DotNetCoreCLI@2  
       inputs:
         command: custom
@@ -41,7 +46,7 @@ stages:
       artifact: BuildPackages
 
     - publish: config
-      displayName: Publish Signing Scripts
+      displayName: Publish signing file list
       artifact: config
 
 - stage: CodeSign
@@ -51,38 +56,39 @@ stages:
     displayName: Code Signing
     pool:
       vmImage: windows-latest    
-    environment: Code Sign - Approvals
     variables:
     - group: Sign Client Credentials
     strategy:
       runOnce:
         deploy:
           steps:
-          # If you have MSCA: https://aka.ms/mscadocs
-          - task: ms-codeanalysis.vss-microsoft-security-code-analysis-devops.build-task-antimalware.AntiMalware@3
-            displayName: AntiMalware Scan
+          - task: UseDotNet@2
+            displayName: 'Use .NET SDK 6.x'
             inputs:
-              EnableServices: true
-              FileDirPath: $(Pipeline.Workspace)\BuildPackages
+              version: 6.x
 
           - task: DotNetCoreCLI@2
             inputs:
               command: custom
               custom: tool
-              arguments: install --tool-path . SignClient
+              arguments: install --tool-path . sign --version 0.9.0-beta.23063.3
             displayName: Install SignTool tool
 
           - pwsh: |
-              .\SignClient "Sign" `
-              --baseDirectory "$(Pipeline.Workspace)\BuildPackages" `
-              --input "**/*.nupkg" `
-              --config "$(Pipeline.Workspace)\config\SignClient.json" `
-              --filelist "$(Pipeline.Workspace)\config\filelist.txt" `
-              --user "$(SignClientUser)" `
-              --secret '$(SignClientSecret)' `
-              --name "CodeSignDemo" `
+              .\sign "code azure-key-vault" `
+              "**/*.nupkg" `
+              --timestamp-url "http://timestamp.digicert.com" `
+              --base-directory "$(Pipeline.Workspace)\BuildPackages" `                            
+              --file-list "$(Pipeline.Workspace)\config\filelist.txt" `
+              --publisher-name "CodeSignDemo" `
               --description "CodeSignDemo" `
-              --descriptionUrl "https://github.com/novotnyllc/CodeSignDemo"
+              --description-url "https://github.com/novotnyllc/CodeSignDemo" `
+              --azure-key-vault-tenant-id "$(SignTenantId)" `
+              --azure-key-vault-client-id "$(SignClientId)" `
+              --azure-key-vault-certificate "$(SignClientId)" `
+              --azure-key-vault-client-secret '$(SignClientSecret)' 
+              --azure-key-vault-certificate "$(SignKeyVaultCertificate)" `
+              --azure-key-vault-url "$(SignKeyVaultUrl)" 
             displayName: Sign packages
               
           - publish: $(Pipeline.Workspace)/BuildPackages
