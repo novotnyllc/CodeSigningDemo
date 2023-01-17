@@ -33,7 +33,7 @@ jobs:
         path: src/AClassLibrary/bin/Release/**/*.nupkg   
     
   sign:
-    if: ${{ github.ref == 'ref/heads/main' }} # Only run this job on the main branch
+    if: github.ref == 'ref/heads/main' # Only run this job on the main branch
     permissions:
       id-token: write # Required for requesting the JWT
       
