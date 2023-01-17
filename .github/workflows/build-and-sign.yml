@@ -75,7 +75,7 @@ jobs:
         **/*.nupkg
         --timestamp-url "http://timestamp.digicert.com"
         --base-directory "${{ github.workspace }}/BuildArtifacts"
-        --file-list "config/filelist.txt"
+        --file-list "${{ github.workspace }}/config/filelist.txt"
         --publisher-name "CodeSignDemo"
         --description "CodeSignDemo"
         --description-url "https://github.com/novotnyllc/CodeSignDemo"
