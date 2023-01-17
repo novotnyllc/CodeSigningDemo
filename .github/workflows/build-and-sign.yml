@@ -80,7 +80,8 @@ jobs:
         --description "CodeSignDemo"
         --description-url "https://github.com/novotnyllc/CodeSignDemo"
         --azure-key-vault-managed-identity true
-        --azure-key-vault-url "${{ secrets.KEY_VAULT_CERTIFICATE_ID }}"
+        --azure-key-vault-url "${{ secrets.KEY_VAULT_URL }}"
+        --azure-key-vault-certificate "${{ secrets.KEY_VAULT_CERTIFICATE_ID }}"
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
