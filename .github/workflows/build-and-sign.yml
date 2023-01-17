@@ -33,6 +33,9 @@ jobs:
         path: src/AClassLibrary/bin/Release/**/*.nupkg   
     
   sign:
+    permissions:
+      id-token: write # Required for requesting the JWT
+      
     runs-on: windows-latest
     steps:
     
@@ -54,4 +57,10 @@ jobs:
     - name: Install Sign CLI tool
       run: dotnet tool install --tool-path . sign --version 0.9.0-beta.23063.3
       
+    - name: 'Az CLI login'
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
