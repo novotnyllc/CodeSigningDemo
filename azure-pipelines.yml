@@ -90,10 +90,10 @@ stages:
         --description "CodeSignDemo" `
         --description-url "https://github.com/novotnyllc/CodeSignDemo" `
         --azure-key-vault-tenant-id "$(SignTenantId)" `
-        --azure-key-vault-client-id "$(SignClientId)" `        
+        --azure-key-vault-client-id "$(SignClientId)" `
         --azure-key-vault-client-secret '$(SignClientSecret)' `
         --azure-key-vault-certificate "$(SignKeyVaultCertificate)" `
-        --azure-key-vault-url "$(SignKeyVaultUrl)" 
+        --azure-key-vault-url "$(SignKeyVaultUrl)"
       displayName: Sign packages
         
     - publish: $(Pipeline.Workspace)/BuildPackages
