@@ -81,7 +81,7 @@ stages:
       displayName: Install SignTool tool
 
     - pwsh: |
-        .\sign "code azure-key-vault" `
+        .\sign code azure-key-vault `
         "**/*.nupkg" `
         --timestamp-url "http://timestamp.digicert.com" `
         --base-directory "$(Pipeline.Workspace)\BuildPackages" `
