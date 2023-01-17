@@ -1,5 +1,8 @@
-# CodeSigningDemo
-Skeleton for demonstrating use of the Sign CLI tool
+# Sign CLI CI sample workflows
+
+Code signing is a complex process that may involve multiple signing formats and artifact types. Some artifacts are containers that contain other signable file types. For example, NuGet Packages (`.nupkg`) frequently contain `.dll` files. The signing tool will sign all files inside-out, starting with the most nested files and then the outer files, ensuring everything is signed in the correct order.
+
+Signing `.exe`/`.dll` files, and other Authenticode file types is only possible on Windows at this time. The recommended solution is to use a multi-stage/job build where the signing steps run on Windows. Running code signing on a separate stage to ensure secrets aren't exposed to the build stage.
 
 ## Azure Setup
 
@@ -19,7 +22,7 @@ The following variables are used by the signing build:
 - `Client Secret` for Azure DevOps Pipelines
 - `Subscription Id` for GitHub Actions
 
-### Azure DevOpps Pipelines
+### Azure DevOps Pipelines
 
 The `azure-pipelines.yml` shows how you can use a multi-stage build with code signing for Azure DevOps
 
