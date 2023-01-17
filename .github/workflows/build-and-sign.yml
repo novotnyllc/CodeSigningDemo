@@ -10,7 +10,6 @@ jobs:
   build:    
     runs-on: ubuntu-latest
     steps:
-    - run: echo "Building branch $GITHUB_REF"    
     - uses: actions/checkout@v3
     
     - name: Setup .NET
@@ -75,7 +74,7 @@ jobs:
         ./sign code azure-key-vault
         **/*.nupkg
         --timestamp-url "http://timestamp.digicert.com"
-        --base-directory "BuildArtifacts"
+        --base-directory "${{ github.workspace }}/BuildArtifacts"
         --file-list "config/filelist.txt"
         --publisher-name "CodeSignDemo"
         --description "CodeSignDemo"
