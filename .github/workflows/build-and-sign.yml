@@ -70,8 +70,9 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     - name: Sign artifacts
+      shell: pwsh
       run: >
-        sign code azure-key-vault
+        ./sign code azure-key-vault
         **/*.nupkg
         --timestamp-url "http://timestamp.digicert.com"
         --base-directory "BuildArtifacts"
